@@ -1,0 +1,26 @@
+#BlueJ class context
+comment0.target=BasicRecipe
+comment1.params=
+comment1.target=BasicRecipe()
+comment1.text=fields\ set\ to\ default\ values\r\n\ \r\n
+comment2.params=title
+comment2.target=BasicRecipe(java.lang.String)
+comment2.text=recipe\ title\ set,\ all\ other\ fields\ default\r\n\ \r\n
+comment3.params=name\ amount
+comment3.target=Ingredient\ addNewIngredient(java.lang.String,\ double)
+comment4.params=
+comment4.target=java.lang.String\ getFullRecipe()
+comment4.text=get\ the\ full\ recipe\ as\ String\r\n\ \r\n
+comment5.params=
+comment5.target=java.util.ArrayList\ getIngredients()
+comment5.text=\ get\ the\ full\ list\ of\ ingredients\r\n\ @return\ ingredients\ (ArrayList)\ -\ collection\ of\ recipe's\ ingredients\r\n
+comment6.params=ingredientList
+comment6.target=void\ setIngredients(java.util.ArrayList)
+comment6.text=set\ the\ ingredients\r\n\ @param\ ingredientList\ (ArrayList)\ -\ the\ collection\ of\ ingredients\r\n
+comment7.params=cookTime
+comment7.target=void\ setCookTime(double)
+comment8.params=
+comment8.target=java.lang.String\ getTitle()
+comment9.params=
+comment9.target=double\ getCookTime()
+numComments=10

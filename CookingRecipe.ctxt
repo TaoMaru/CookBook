@@ -1,0 +1,8 @@
+#BlueJ class context
+comment0.target=CookingRecipe
+comment0.text=CookingRecipe.java\r\n\ This\ class\ holds\ the\ details\ for\ a\ cooking\ recipe\r\n\r\n\ @author\ Maria\ Jackson\r\n\ @version\ 1.0\ Apr\ 22,\ 2022\r\n
+comment1.params=
+comment1.target=CookingRecipe()
+comment2.params=
+comment2.target=java.lang.String\ getFullRecipe()
+numComments=3

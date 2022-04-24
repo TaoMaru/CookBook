@@ -1,0 +1,27 @@
+#BlueJ class context
+comment0.target=Ingredient
+comment0.text=Ingredient.java\r\n\ This\ class\ contains\ the\ basic\ information\ needed\ for\ a\ recipe\ ingredient\r\n\r\n\ @author\ Maria\ Jackson\r\n\ @version\ 1.0\ Apr\ 22,\ 2022\r\n\ @version\ 1.1\ -\ Apr\ 23,\ 2022\ -\ Added\ getters\ &\ setters\ for\ fields,\ and\ hasDetails()\r\n
+comment1.params=
+comment1.target=Ingredient()
+comment1.text=\ set\ all\ fields\ to\ default\r\n\ \r\n
+comment10.params=
+comment10.target=boolean\ hasDetails()
+comment2.params=name\ amount
+comment2.target=Ingredient(java.lang.String,\ double)
+comment2.text=set\ name\ and\ amount\ fields,\ details\ set\ to\ default\r\n\ @param\ name\ (Str)\ -\ name\ of\ ingredient\r\n\ @param\ amount\ (double)\ -\ amount\ needed\r\n
+comment3.params=name\ amount\ details
+comment3.target=Ingredient(java.lang.String,\ double,\ java.lang.String)
+comment3.text=set\ all\ fields\r\n\ @param\ name\ (Str)\ -\ name\ of\ ingredient\r\n\ @param\ amount\ (double)\ -\ amount\ needed\r\n\ @param\ details\ (Str)\ -\ additional\ info\ about\ ingredient\r\n
+comment4.params=
+comment4.target=java.lang.String\ getName()
+comment5.params=
+comment5.target=double\ getAmount()
+comment6.params=
+comment6.target=java.lang.String\ getDetails()
+comment7.params=name
+comment7.target=void\ setName(java.lang.String)
+comment8.params=amount
+comment8.target=void\ setAmount(double)
+comment9.params=details
+comment9.target=void\ setDetails(java.lang.String)
+numComments=11
