@@ -4,13 +4,19 @@
  *
  * @author Maria Jackson
  * @version 1.0 Apr 22, 2022
- * @version 1.1 Apr 23, 2022 - Added getters and setters for fields
+ * @version 1.1 Apr 23, 2022 - Added getters and setters for fields, added getIngredients
+ * method: allows access to entire ArrayList of ingredients.
+ * @version 1.2 Apr 26, 2022 - Added Serializable implementation, added abstract
+ * getCookingTime() method
  */
 import java.util.ArrayList;
+import java.io.Serializable;
 
-public abstract class BasicRecipe
+public abstract class BasicRecipe implements Serializable
 {
     // instance variables:
+    protected static final long serialVersionUID = 1L;
+    
     protected String title;
     protected ArrayList<Ingredient> ingredients;
     protected double cookTime;
@@ -88,4 +94,6 @@ public abstract class BasicRecipe
     {
         return cookTime;
     }
+    
+    public abstract String getCookingTime();
 }

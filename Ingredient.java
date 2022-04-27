@@ -5,8 +5,12 @@
  * @author Maria Jackson
  * @version 1.0 Apr 22, 2022
  * @version 1.1 - Apr 23, 2022 - Added getters & setters for fields, and hasDetails()
+ * @version 1.2 Apr 26, 2022 - Added Seriablizable implementation (does not have declared
+ * static final serial field, but works as a part of a recipe's ingredient collection)
  */
-public class Ingredient
+import java.io.Serializable;
+
+public class Ingredient implements Serializable
 {
     // instance variables:
     private String name; // ingredient name

@@ -6,6 +6,8 @@
  * @version 1.0 Apr 22, 2022
  * @version 1.1 Apr 23, 2022 - Added constructors with calls to super(), added getter 
  * & setter for bakeTime
+ * @version 1.2 Apr 26, 2022 - now inherits Serializable implementation from super, added
+ * override of super's abstract getCookingTime method, removed bakeTime field: redundant.
  */
 public class BakingRecipe extends BasicRecipe
 {
@@ -16,13 +18,11 @@ public class BakingRecipe extends BasicRecipe
     public BakingRecipe()
     {
         super();
-        bakeTime = 0.0;
     }
     
     public BakingRecipe(String title)
     {
         super(title);
-        bakeTime = 0.0;
     }
     
     //methods:
@@ -32,8 +32,12 @@ public class BakingRecipe extends BasicRecipe
             + "Bake for " + String.valueOf(bakeTime);
     }
     
-    public double getBakeTime()
+    @Override
+    /** get baking time for recipe
+     * @return baking-specific cook time format (Str)
+     */
+    public  String getCookingTime()
     {
-        return bakeTime;
+        return "Bake for: " + String.valueOf(getCookTime());
     }
 }
