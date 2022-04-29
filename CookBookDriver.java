@@ -13,6 +13,9 @@
  * displayRecipes() method: streamlined organization & display of recipe info, respective
  * fields added
  * @version 1.3 Apr 27, 2022 - added menu/selection functionality, organized fields/methods
+ * @version 1.4 Apr 28, 2022 - added menu options for saving/loading recipe files & their
+ * respective methods, added menu option for merging loaded recipes with new recipes,
+ * modulated menu options 1-7 more clearly.
  */
 
 import java.util.ArrayList;
@@ -30,10 +33,12 @@ public class CookBookDriver implements Serializable
         + "\n2 - View current recipes"
         + "\n3 - Save current recipes to file"
         + "\n4 - Load saved recipes from file"
-        + "\n5 - Search recipes by title"
-        + "\n6 - Delete a recipe"
-        + "\n7 - Exit";
-    private String validOptions = "1234567";
+        + "\n5 - View loaded recipes"
+        + "\n6 - Merge loaded & current recipes"
+        + "\n7 - Search recipes by title"
+        + "\n8 - Delete a recipe"
+        + "\n9 - Exit";
+    private String validOptions = "123456789";
     private String menuChoice;
     private String recipeOptions = "Recipe Types:"
         + "\nB - Baking Recipe"
@@ -69,6 +74,17 @@ public class CookBookDriver implements Serializable
     public void displayMenu()
     {
         System.out.println(menu);
+    }
+    
+    /**display greeting
+     * 
+     */
+    public void displayGreeting()
+    {
+        System.out.println("Hey, Good Cookin'!"
+            + "\nWelcome to the Virtual CookBook!"
+            + "\nHere you can create, delete, save, and "
+            + "\nload your recipes!");
     }
     
     /** display recipe type options
@@ -150,7 +166,7 @@ public class CookBookDriver implements Serializable
             case "C" : recipe = new CookingRecipe();
             break;
         }
-        currentRecipes.add(newRecipe);
+        currentRecipes.add(recipe);
         numRecipes++;
         return recipe;
     }
@@ -191,6 +207,29 @@ public class CookBookDriver implements Serializable
         newRecipe.setTitle(getNewTitle(typeChoice));
     }
     
+    /** merge current recipes ArrayList with loaded recipes ArrayList
+     * newRecipeBatch added to currentRecipes
+     */
+    public void mergeRecipeLists()
+    {
+        if(newRecipeBatch.size() > 0)
+        {
+            System.out.println("Merging " + newRecipeBatch.size() + " recipes with"
+                + " current recipes...");
+            for(int index = 0; index < newRecipeBatch.size(); index++)
+            {
+                currentRecipes.add(newRecipeBatch.get(index));
+                numRecipes++;
+            }
+        }
+        else
+        {
+            System.out.println("There are no loaded recipes to merge.");
+        }
+        System.out.println("Changes only apply to current recipes list."
+            + "\nAny saved or loaded files are unchanged.");
+    }
+    
     //String version of read recipes from file idea, unused, possibly obsolete
     /** get String version of recipes
      * @param filename (Str) - .txt file containing recipes
@@ -219,7 +258,7 @@ public class CookBookDriver implements Serializable
     
     
     // Recipe Object Write, Read, and Display methods: Added Apr 26. 2022
-    /** read & pull recipe objects from data file
+    /** read recipe objects from data file & add them to newRecipeBatch ArrayList
      * @param filename (Str) - .bin file to read
      */
     public ArrayList<BasicRecipe> readRecipeObjectsFromFile(String filename)
@@ -250,7 +289,7 @@ public class CookBookDriver implements Serializable
         return newRecipeBatch;
     }
     
-    /** write recipes as objects to data file
+    /** write recipes as objects to data file item-by-item (outside of arrayList)
      * @param filename (Str) - .bin filename to write to
      */
     public void writeRecipeObjectsToFile(String filename)
@@ -271,22 +310,24 @@ public class CookBookDriver implements Serializable
         }
     }
     
-    /** format and display recipe details
+    //recipe display method:
+    /** format and display recipe details (menu options 2 & 5)
      * @param recipeArr (ArrayList<BasicRecipe>) - recipes to print
      */
     public void displayRecipes(ArrayList<BasicRecipe> recipeArr)
     {
+        System.out.println("Displaying " + recipeArr.size() + " recipes: ");
         for(int index = 0; index < recipeArr.size(); index++)
         {
             BasicRecipe recipe = recipeArr.get(index);
-            ArrayList<Ingredient> ingredients = recipe.getIngredients();
             String recipeDetails = "";
+            ArrayList<Ingredient> ingredients = recipe.getIngredients();
             for(int i = 0; i < ingredients.size(); i++)
             {
                 recipeDetails += "       " + ingredients.get(i).getName() + ": "
                                     + ingredients.get(i).getAmount() + "\n";
             }
-            System.out.println(recipe.getTitle() + ": \n" + "   Ingredients: \n"
+            System.out.println("\n" + recipe.getTitle() + ": \n" + "   Ingredients: \n"
                 + recipeDetails + "\n   " + recipe.getCookingTime());
             
         }
@@ -300,12 +341,14 @@ public class CookBookDriver implements Serializable
      */
     public ArrayList<BasicRecipe> readRecipeArrayListFile(String filename)
     {
+        ArrayList<BasicRecipe> inRecipeBatch = new ArrayList<BasicRecipe>();
         try
         {
             inObject = new ObjectInputStream(new FileInputStream( filename ));
             try
             {
-                newRecipeBatch = (ArrayList<BasicRecipe>) inObject.readObject();
+                inRecipeBatch = (ArrayList<BasicRecipe>) inObject.readObject();
+                System.out.println("Loading recipe file...");
             }
             catch(ClassNotFoundException e)
             {
@@ -318,18 +361,18 @@ public class CookBookDriver implements Serializable
             System.out.println("Error reading recipe ArrayList file.");
             System.out.println(e.getMessage());
         }
-        return newRecipeBatch;
+        return inRecipeBatch;
     }
     
     /**write recipe ArrayList to file as one object
      * @param filename (Str) - name of file to write to
      */
-    public void writeRecipeArrayListFile(String filename)
+    public void writeRecipeArrayListFile(String filename, ArrayList<BasicRecipe> recipeList)
     {
         try
         {
             outObject = new ObjectOutputStream(new FileOutputStream( filename ));
-            outObject.writeObject(currentRecipes);
+            outObject.writeObject(recipeList);
             outObject.close();
         }
         catch(IOException e)
@@ -338,50 +381,99 @@ public class CookBookDriver implements Serializable
         }
     }
     
+    /**save recipes list to file (menu option 3)
+     * @param recipeList (ArrayList<BasicRecipe>) - list of recipes to save
+     * @pre recipes list should not be empty when passed to method
+     * @post entire recipes list is saved as object in .bin file
+     */
+    public void saveRecipeList(ArrayList<BasicRecipe> recipeList, String filename)
+    {
+        System.out.println("Saving recipe collection...");
+        writeRecipeArrayListFile(filename, recipeList);
+    }
+    
+    /** get filename and load a recipe array from file (menu option 4)
+     * @post loaded recipe array is saved to newRecipeBatch ArrayList
+     */
+    public void loadRecipeList()
+    {
+        newRecipeBatch = readRecipeArrayListFile(getValidFilename());
+    }
+    
+    /** get a new .bin filename
+     * filenames are valid if ending in .bin
+     * @return newFilename (Str) - .bin filename
+     */
+    public String getValidFilename()
+    {
+        invalid = true;
+        String newFilename = "";
+        do
+        {
+            System.out.println("Please enter the filename: ");
+            if(inScan.hasNextLine())
+            {
+                newFilename = inScan.nextLine();
+            }
+            if(newFilename.endsWith(".bin"))
+            {
+                invalid = false;
+            }
+        }
+        while(invalid);
+        return newFilename;
+    }
+    
     
     // execution:
     public static void main(String[] args)
     {
         CookBookDriver c = new CookBookDriver();
-        /* Pre Apr 27, 2022 recipe creation trial *
-        // create a recipe:
-        c.newRecipe = new BakingRecipe("Bread");
-        c.newRecipe.addNewIngredient("Flour", 500.0);
-        c.newRecipe.addNewIngredient("Water", 270.0);
-        c.newRecipe.addNewIngredient("Yeast", 7.0);
-        c.newRecipe.addNewIngredient("Salt", 8.0);
-        c.newRecipe.addNewIngredient("Sugar", 10.0);
-        c.newRecipe.setCookTime(30.0);
-        //add recipe to currentRecipes collection:
-        c.currentRecipes.add(c.newRecipe);
-        c.numRecipes++; //increment total number of recipes
-        
-        //System.out.println(c.newRecipe.getFullRecipe()); <--old way
-        
-        /*save and read binary recipe file: item-by-item
-        c.writeToFile("Recipes01.bin");
-        c.readRecipeDataFile("Recipes01.bin");
-        
-        
-        // save and read binary recipe object file: entire objects
-        c.writeRecipeObjectsToFile("Recipes02.bin");
-        c.readRecipeObjectsFromFile("Recipes02.bin");
-        c.displayRecipes(c.newRecipeBatch); // <--new way
-        */
-       
-        //*New Recipe Creation Trial:Apr27*
-        System.out.println("Hey, Good Cookin'!"
-            + "\nWelcome to the Virtual CookBook!"
-            + "\nHere you can create,delete, save, and load your recipes!");
-        c.menuChoice = "";
-        while(!c.menuChoice.equals("7"))
+        c.displayGreeting(); // greeting
+        // prompt menu selection:
+        c.menuChoice = ""; // menuChoice placeholder
+        while(!c.menuChoice.equals("9")) // prompt menu until 9/Exit selected
         {
-            c.menuChoice = c.getMenuChoice();
-            if(c.menuChoice.equals("1"))
+            c.menuChoice = c.getMenuChoice(); // display menu & get new choice
+            if(c.menuChoice.equals("1")) // add new recipe
             {
                 System.out.println("Creating a recipe!");
-                c.getChoiceSetNewRecipe();
-                c.setNewTitle();
+                c.getChoiceSetNewRecipe(); // get recipe type, create new recipe
+                c.setNewTitle(); // add recipe title
+            }
+            else if(c.menuChoice.equals("2")) // view current recipes
+            {
+                if(c.currentRecipes.size() < 1) // no recipes in list
+                {
+                    System.out.println("There are no current recipes to display");
+                }
+                else // at least one recipe has been made
+                {
+                    c.displayRecipes(c.currentRecipes); // display all recipes
+                }
+            }
+            else if(c.menuChoice.equals("3")) // save current recipes to file
+            {
+                c.saveRecipeList(c.currentRecipes, c.getValidFilename()); //save new file
+            }
+            else if(c.menuChoice.equals("4")) // load recipes from file
+            {
+                c.loadRecipeList(); // get filename, load recipes into newRecipeBatch
+            }
+            else if(c.menuChoice.equals("5")) // view loaded recipes
+            {
+                if(c.newRecipeBatch.size() <1) // no recipes in new recipe batch list
+                {
+                    System.out.println("There are no recipes from loaded file");
+                }
+                else // at least one recipe in new batch list
+                {
+                    c.displayRecipes(c.newRecipeBatch); // display all new batch recipes
+                }
+            }
+            else if(c.menuChoice.equals("6")) // merge current & loaded recipe lists
+            {
+                c.mergeRecipeLists(); // add loaded recipes to current recipe list
             }
         }
         System.out.println("Goodbye!");
