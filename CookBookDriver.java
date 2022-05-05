@@ -18,6 +18,8 @@
  * modulated menu options 1-7 more clearly.
  * @version 1.5 May 02, 2022 - added methods for searching recipes and deleting recipes,
  * added setting ingredients functionality to creating new recipe with submenus
+ * @version 1.6 May 05, 2022 - Added methods for adding instructions to recipes and submenu
+ * for viewing instructions
  */
 
 import java.util.ArrayList;
@@ -550,6 +552,10 @@ public class CookBookDriver implements Serializable
         System.out.println(recipe.getTitle() + ": \n" + "   Ingredients: \n"
             + recipeDetails + "\n   " + recipe.getCookingTime());
     }
+    
+    /** display recipe instructions with listed Step numbers
+     * 
+     */
     
     // Read & Write ArrayList recipe data file methods: added Apr 27, 2022
     /** get recipe ArrayList from file

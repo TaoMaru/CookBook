@@ -7,6 +7,7 @@
  * @version 1.1 - Apr 23, 2022 - Added getters & setters for fields, and hasDetails()
  * @version 1.2 Apr 26, 2022 - Added Seriablizable implementation (does not have declared
  * static final serial field, but works as a part of a recipe's ingredient collection)
+ * @version 1.3 May 04, 2022 - Added documentation for all methods.
  */
 import java.io.Serializable;
 
@@ -52,36 +53,57 @@ public class Ingredient implements Serializable
     }
     
     //methods:
+    /** get ingredient name
+     * @return name (Str) - ingredient name
+     */
     public String getName()
     {
         return name;
     }
     
+    /** get ingredient amount
+     * @return amount (double) - ingredient amount
+     */
     public double getAmount()
     {
         return amount;
     }
     
+    /** get ingredient details
+     * @return details (Str) - ingredient details
+     */
     public String getDetails()
     {
         return details;
     }
     
+    /** set ingredient name
+     * @param name (Str) - ingredient name
+     */
     public void setName(String name)
     {
         this.name = name;
     }
     
+    /** set amount needed
+     * @param amount (double) - amount of ingredient
+     */
     public void setAmount(double amount)
     {
         this.amount = amount;
     }
     
+    /** set details
+     * @param details (Str) - ingredient details
+     */
     public void setDetails(String details)
     {
         this.details = details;
     }
     
+    /** check if ingredient has extra details
+     * @return boolean - true if ingredient has extra details
+     */
     public boolean hasDetails()
     {
         return !(details.equals(""));

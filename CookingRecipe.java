@@ -6,18 +6,26 @@
  * @version 1.0 Apr 22, 2022 - Constructor and getFullRecipe() methods
  * @version 1.2 Apr 26, 2022 - added override of super's abstract getCookingTime() method,
  * now inherits Serializable implementation
+ * @version 1.3 May 04, 2022 - added documentation
  */
 public class CookingRecipe extends BasicRecipe
 {
     // instance variables:
     
     // constructors:
+    /** default constructor
+     * calls super's default constructor
+     */
     public CookingRecipe()
     {
         super();
     }
     
     //methods:
+    @Override
+    /** get recipe's details
+     * @return recipe's details (Str) - cook-specific details added to super's method
+     */
     public String getFullRecipe()
     {
         return super.getFullRecipe() + "\n\t"
