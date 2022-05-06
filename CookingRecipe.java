@@ -6,7 +6,7 @@
  * @version 1.0 Apr 22, 2022 - Constructor and getFullRecipe() methods
  * @version 1.2 Apr 26, 2022 - added override of super's abstract getCookingTime() method,
  * now inherits Serializable implementation
- * @version 1.3 May 04, 2022 - added documentation
+ * @version 1.3 May 05, 2022 - added documentation
  */
 public class CookingRecipe extends BasicRecipe
 {

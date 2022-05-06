@@ -19,7 +19,7 @@
  * @version 1.5 May 02, 2022 - added methods for searching recipes and deleting recipes,
  * added setting ingredients functionality to creating new recipe with submenus
  * @version 1.6 May 05, 2022 - Added methods for adding instructions to recipes and submenu
- * for viewing instructions
+ * for viewing instructions, added Quit option to loading recipe file menu option
  */
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class CookBookDriver implements Serializable
         + "\n4 - Load saved recipes from file"
         + "\n5 - View loaded recipes"
         + "\n6 - Merge loaded & current recipes"
-        + "\n7 - Search recipes by title"
+        + "\n7 - Find recipe by title"
         + "\n8 - Delete a recipe"
         + "\n9 - Exit";
     private String validOptions = "123456789";
@@ -133,6 +133,28 @@ public class CookBookDriver implements Serializable
         return menuChoice;
     }
     
+    
+    //recipe creation, deletion, and editing methods:
+    /** create new recipe by type
+     * @param type (Str) - the type of recipe to be made
+     * @pre type selection must be made and passed to method
+     * @post new recipe object created, added to currentRecipes, numRecipes incremented
+     */
+    public BasicRecipe createNewRecipe(String type)
+    {
+        BasicRecipe recipe = null;
+        switch(type)
+        {
+            case "B" : recipe = new BakingRecipe();
+            break;
+            case "C" : recipe = new CookingRecipe();
+            break;
+        }
+        currentRecipes.add(recipe);
+        numRecipes++;
+        return recipe;
+    }
+    
     /** get valid recipe type choice
      * @return typeChoice (Str) - selected recipe type
      */
@@ -158,107 +180,6 @@ public class CookBookDriver implements Serializable
         }
         while(invalid);
         return typeChoice;
-    }
-    
-    /**get yes/no choice for adding ingredients to new recipe
-     * @return boolean - true if Yes chosen, i.e. an ingredient will be added
-     */
-    public boolean addingIngredient()
-    {
-        invalid = true;
-        yesNoChoice = "";
-        do
-        {
-            System.out.print(" \n" + "Would you like to add an ingredient (Y/N): ");
-            if(inScan.hasNextLine())
-            {
-                yesNoChoice = inScan.nextLine();
-            }
-            if(yesNoChoice.equals(""))
-            {
-                yesNoChoice = inScan.nextLine();
-            }
-            if(yesNoChoice.length() == 1 && validYNOptions.contains
-                                                (yesNoChoice.toUpperCase()))
-            {
-                invalid = false;
-                if(yesNoChoice.toUpperCase().equals("Y"))
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                System.out.println(yesNoChoice + " is not a valid option");
-            }
-        }
-        while(invalid);
-        return false;
-    }
-    
-    /** get ingredient name and amount for new recipe, set new ingredient
-     * 
-     */
-    public void addIngredients()
-    {
-        while(addingIngredient())
-        {
-            String ingredientName = "";
-            Double ingredientAmount = 0.0;
-            System.out.print("Please enter the ingredient name: ");
-            if(inScan.hasNextLine())
-            {
-                ingredientName = inScan.nextLine();
-            }
-            System.out.print("Please enter the ingredient amount: ");
-            if(inScan.hasNextDouble())
-            {
-                ingredientAmount = inScan.nextDouble();
-            }
-            System.out.println("Adding new ingredient: " + ingredientName 
-                + " " + ingredientAmount);
-            newRecipe.addNewIngredient(ingredientName, ingredientAmount);
-        }
-    }
-    
-    /** set cook time for new recipe
-     * 
-     */
-    public void setCookTime()
-    {
-        Double cookTime = 0.0;
-        String cookType = "bake";
-        if(typeChoice.equals("C"))
-        {
-            cookType = "cook";
-        }
-        System.out.print(" \n" + "Please enter the " + cookType + " time: ");
-        if(inScan.hasNextDouble())
-        {
-            cookTime = inScan.nextDouble();
-        }
-        newRecipe.setCookTime(cookTime);
-    }
-    
-    //recipe creation, deletion, and editing methods:
-    /** create new recipe by type
-     * @param type (Str) - the type of recipe to be made
-     * @pre type selection must be made and passed to method
-     * @post new recipe object created, added to currentRecipes, numRecipes incremented
-     */
-    public BasicRecipe createNewRecipe(String type)
-    {
-        BasicRecipe recipe = null;
-        switch(type)
-        {
-            case "B" : recipe = new BakingRecipe();
-            break;
-            case "C" : recipe = new CookingRecipe();
-            break;
-        }
-        currentRecipes.add(recipe);
-        numRecipes++;
-        return recipe;
     }
     
     /**get recipe type choice and create a new recipe obj, newRecipe
@@ -297,6 +218,151 @@ public class CookBookDriver implements Serializable
         newRecipe.setTitle(getNewTitle(typeChoice));
     }
     
+    /** set cook time for new recipe
+     * 
+     */
+    public void setCookTime()
+    {
+        Double cookTime = 0.0;
+        String cookType = "bake";
+        if(typeChoice.equals("C"))
+        {
+            cookType = "cook";
+        }
+        System.out.print(" \n" + "Please enter the " + cookType + " time: ");
+        if(inScan.hasNextDouble())
+        {
+            cookTime = inScan.nextDouble();
+        }
+        newRecipe.setCookTime(cookTime);
+    }
+    
+    /** get yes/no choice
+     * @return yesNoChoice (Str) - "Y" or "N" option
+     */
+    public String getYesNo()
+    {
+        invalid = true;
+        yesNoChoice = "";
+        do
+        {
+            if(inScan.hasNextLine())
+            {
+                yesNoChoice = inScan.nextLine();
+            }
+            if(yesNoChoice.equals(""))
+            {
+                yesNoChoice = inScan.nextLine();
+            }
+            if(yesNoChoice.length() == 1 && validYNOptions.contains
+                                                (yesNoChoice.toUpperCase()))
+            {
+                invalid = false;
+                if(yesNoChoice.toUpperCase().equals("Y"))
+                {
+                    return "Y";
+                }
+            }
+            else
+            {
+                System.out.println(yesNoChoice + " is not a valid option");
+            }
+        }
+        while(invalid);
+        return "N";
+    }
+    
+    /**get yes/no choice for adding an ingredient to a recipe
+     * @return boolean - true if Yes chosen, i.e. an ingredient will be added
+     */
+    public boolean addingIngredient()
+    {
+        yesNoChoice = "";
+        System.out.print(" \n" + "Would you like to add an ingredient (Y/N): ");
+        if(getYesNo().equals("Y"))
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    /** get ingredient name and amount for new recipe, set new ingredient
+     * 
+     */
+    public void addIngredients()
+    {
+        while(addingIngredient())
+        {
+            String ingredientName = "";
+            Double ingredientAmount = 0.0;
+            System.out.print("Please enter the ingredient name: ");
+            if(inScan.hasNextLine())
+            {
+                ingredientName = inScan.nextLine();
+            }
+            System.out.print("Please enter the ingredient amount: ");
+            if(inScan.hasNextDouble())
+            {
+                ingredientAmount = inScan.nextDouble();
+            }
+            System.out.println("Adding new ingredient: " + ingredientName 
+                + " " + ingredientAmount);
+            newRecipe.addNewIngredient(ingredientName, ingredientAmount);
+        }
+    }
+    
+    /** get yes/no choice for adding instructions to a recipe
+     * @return boolean - true if Yes selected, i.e. instructions will be added
+     */
+    public boolean addingInstructions()
+    {
+        System.out.print(" \n"+"Would you like to add instructions for this recipe (Y/N): ");
+        if(getYesNo().equals("Y"))
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    /** get choice, add insructions to new recipe step by step
+     * 
+     */
+    public void addInstructions()
+    {
+        int currentStep = 1;
+        String stepDetails = "";
+        boolean addingStep = true;
+        if(addingInstructions())
+        {
+            do
+            {
+                System.out.print(" \n"+"Please enter the details for Step "+currentStep+": ");
+                if(inScan.hasNextLine())
+                {
+                    stepDetails = inScan.nextLine();
+                    newRecipe.addStep(stepDetails);
+                }
+                currentStep++;
+                System.out.print(" \n"+"Would you like to add another step (Y/N): ");
+                if(getYesNo().equals("N"))
+                {
+                    addingStep = false;    
+                }
+            }
+            while(addingStep);
+        }
+    }
+    
+    /** add a step to end of new recipe's instructions
+     * @param step (Str) - new step to be added
+     */
+    public void addStepToNewRecipe(String step)
+    {
+        newRecipe.addStep(step);
+    }
+    
+    
+    //Recipe Lists method:
     /** merge current recipes ArrayList with loaded recipes ArrayList
      * newRecipeBatch added to currentRecipes
      */
@@ -551,11 +617,48 @@ public class CookBookDriver implements Serializable
         }
         System.out.println(recipe.getTitle() + ": \n" + "   Ingredients: \n"
             + recipeDetails + "\n   " + recipe.getCookingTime());
+        displayInstructions(recipe);
+    }
+    
+    /** get display instructions choice
+     * @return boolean - true if Yes selected, i.e. instructions must be displayed
+     */
+    public boolean needInstructions()
+    {
+        System.out.print(" \n"+"Do you want to view this recipe's instructions (Y/N): ");
+        if(getYesNo().equals("Y"))
+        {
+            return true;
+        }
+        return false;
     }
     
     /** display recipe instructions with listed Step numbers
-     * 
+     * @param recipe (BasicRecipe) - recipe to pull instructions from
      */
+    public void displayInstructions(BasicRecipe recipe)
+    {
+        ArrayList<String> instructions = null;
+        int step;
+        if(needInstructions())
+        {
+            instructions = recipe.getInstructions();
+            if(instructions.isEmpty())
+            {
+                System.out.println("There are no instructions to display");
+            }
+            else
+            {
+                System.out.println("Instructions: ");
+                for(int index = 0; index < instructions.size(); index++)
+                {
+                    step = index + 1;
+                    System.out.println("Step " + step + ": " + instructions.get(index));
+                }
+            }
+        }
+    }
+    
     
     // Read & Write ArrayList recipe data file methods: added Apr 27, 2022
     /** get recipe ArrayList from file
@@ -565,6 +668,10 @@ public class CookBookDriver implements Serializable
     public ArrayList<BasicRecipe> readRecipeArrayListFile(String filename)
     {
         ArrayList<BasicRecipe> inRecipeBatch = new ArrayList<BasicRecipe>();
+        if(filename.equals("Q"))
+        {
+            return null;
+        }
         try
         {
             inObject = new ObjectInputStream(new FileInputStream( filename ));
@@ -621,6 +728,10 @@ public class CookBookDriver implements Serializable
     public void loadRecipeList()
     {
         newRecipeBatch = readRecipeArrayListFile(getValidFilename());
+        if(newRecipeBatch == null)
+        {
+            System.out.println("Cancelled loading recipe file.");
+        }
     }
     
     /** get a new .bin filename
@@ -642,9 +753,14 @@ public class CookBookDriver implements Serializable
             {
                 invalid = false;
             }
+            else if(newFilename.toUpperCase().equals("Q"))
+            {
+                return "Q";
+            }
             else
             {
-                System.out.println("Filename must include '.bin'.");
+                System.out.println("Filename must include '.bin'."
+                    + "\n(Type 'Q' to cancel)");
             }
         }
         while(invalid);
@@ -669,6 +785,7 @@ public class CookBookDriver implements Serializable
                 c.setNewTitle(); // add recipe title
                 c.addIngredients(); //add ingredient(s) to recipe
                 c.setCookTime(); // get input, set cook time for recipe
+                c.addInstructions(); // get input, add instructions to recipe step by step
             }
             else if(c.menuChoice.equals("2")) // view current recipes
             {

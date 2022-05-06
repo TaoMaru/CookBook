@@ -9,7 +9,7 @@
  * @version 1.2 Apr 26, 2022 - Added Serializable implementation, added abstract
  * getCookingTime() method
  * @version 1.3 May 05, 2022 - Added instructions field and accompanying get & set methods,
- * added documentation
+ * added documentation, added method to add step to instructions
  */
 import java.util.ArrayList;
 import java.io.Serializable;
@@ -61,6 +61,13 @@ public abstract class BasicRecipe implements Serializable
     }
     
     // methods:
+    /** add an Ingredient to recipe
+     * calls Ingredient constructor
+     * @param name (Str) - ingredient's name
+     * @param amount (double) - amount of ingredient
+     * @post adds new ingredient to recipe's ingredient ArrayList
+     * @return newIngredient (Ingredient) - the new ingredient object
+     */
     public Ingredient addNewIngredient(String name, double amount)
     {
         Ingredient newIngredient = new Ingredient(name, amount);
@@ -82,6 +89,9 @@ public abstract class BasicRecipe implements Serializable
        return title + "\n\t" + allIngredients;
     }
     
+    /** set recipe title
+     * @param title (Str) - recipe's new title
+     */
     public void setTitle(String title)
     {
         this.title = title;
@@ -109,6 +119,14 @@ public abstract class BasicRecipe implements Serializable
     public void setInstructions(ArrayList<String> instructions)
     {
         this.instructions = instructions;
+    }
+    
+    /** add a step to instructions
+     * @post a step is added to the end of the instructions ArrayList
+     */
+    public void addStep(String newStep)
+    {
+        instructions.add(newStep);
     }
     
     /** get the recipe title
@@ -147,7 +165,5 @@ public abstract class BasicRecipe implements Serializable
      * 
      */
     public abstract String getCookingTime();
-    
-    /** need method for adding one instruction at a time */
     
 }
