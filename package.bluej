@@ -1,17 +1,17 @@
 #BlueJ package file
-dependency1.from=CookBookDriver
-dependency1.to=BasicRecipe
+dependency1.from=BasicRecipe
+dependency1.to=Ingredient
 dependency1.type=UsesDependency
 dependency2.from=CookBookDriver
-dependency2.to=BakingRecipe
+dependency2.to=BasicRecipe
 dependency2.type=UsesDependency
 dependency3.from=CookBookDriver
-dependency3.to=CookingRecipe
+dependency3.to=BakingRecipe
 dependency3.type=UsesDependency
 dependency4.from=CookBookDriver
-dependency4.to=Ingredient
+dependency4.to=CookingRecipe
 dependency4.type=UsesDependency
-dependency5.from=BasicRecipe
+dependency5.from=CookBookDriver
 dependency5.to=Ingredient
 dependency5.type=UsesDependency
 editor.fx.0.height=777

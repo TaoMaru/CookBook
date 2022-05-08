@@ -8,6 +8,8 @@
  * @version 1.2 Apr 26, 2022 - Added Seriablizable implementation (does not have declared
  * static final serial field, but works as a part of a recipe's ingredient collection)
  * @version 1.3 May 04, 2022 - Added documentation for all methods.
+ * @version 1.4 May 07, 2022 -Added measurement unit field, updated constructors as needed,
+ * added set/getter for unit
  */
 import java.io.Serializable;
 
@@ -16,6 +18,7 @@ public class Ingredient implements Serializable
     // instance variables:
     private String name; // ingredient name
     private double amount; // amount of ingredient needed in grams
+    private String unit; // the measurement type for ingredient
     private String details; // additional info about the ingredient
     
     //constructors:
@@ -26,29 +29,33 @@ public class Ingredient implements Serializable
     {
         name = ""; 
         amount = 0.0;
+        unit = "";
         details = "";
     }
     
-    /**set name and amount fields, details set to default
+    /**set name, amount, and unit fields, details set to default
      * @param name (Str) - name of ingredient
      * @param amount (double) - amount needed
      */
-    public Ingredient(String name, double amount)
+    public Ingredient(String name, double amount, String unit)
     {
         this.name = name;
         this.amount = amount;
+        this.unit = unit;
         details = "";
     }
     
     /**set all fields
      * @param name (Str) - name of ingredient
      * @param amount (double) - amount needed
+     * @param unit (Str) - measurement type
      * @param details (Str) - additional info about ingredient
      */
-    public Ingredient(String name, double amount, String details)
+    public Ingredient(String name, double amount, String unit, String details)
     {
         this.name = name;
         this.amount = amount;
+        this.unit = unit;
         this.details = details;
     }
     
@@ -67,6 +74,14 @@ public class Ingredient implements Serializable
     public double getAmount()
     {
         return amount;
+    }
+    
+    /** get ingredient unit
+     * @return unit (Str) - ingredient measurement type
+     */
+    public String getUnit()
+    {
+        return unit;
     }
     
     /** get ingredient details
@@ -91,6 +106,14 @@ public class Ingredient implements Serializable
     public void setAmount(double amount)
     {
         this.amount = amount;
+    }
+    
+    /** set unit
+     * @param unit (Str) - the measurement type for ingredient
+     */
+    public void setUnit(String unit)
+    {
+        this.unit = unit;
     }
     
     /** set details

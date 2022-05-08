@@ -10,6 +10,7 @@
  * getCookingTime() method
  * @version 1.3 May 05, 2022 - Added instructions field and accompanying get & set methods,
  * added documentation, added method to add step to instructions
+ * @version 1.4 May 07, 2022 - Updated addIngredient method to reflect new unit field
  */
 import java.util.ArrayList;
 import java.io.Serializable;
@@ -65,12 +66,13 @@ public abstract class BasicRecipe implements Serializable
      * calls Ingredient constructor
      * @param name (Str) - ingredient's name
      * @param amount (double) - amount of ingredient
+     * @param unit (Str) - measurement type
      * @post adds new ingredient to recipe's ingredient ArrayList
      * @return newIngredient (Ingredient) - the new ingredient object
      */
-    public Ingredient addNewIngredient(String name, double amount)
+    public Ingredient addNewIngredient(String name, double amount, String unit)
     {
-        Ingredient newIngredient = new Ingredient(name, amount);
+        Ingredient newIngredient = new Ingredient(name, amount, unit);
         ingredients.add(newIngredient);
         return newIngredient;
     }

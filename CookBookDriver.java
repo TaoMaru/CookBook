@@ -20,11 +20,16 @@
  * added setting ingredients functionality to creating new recipe with submenus
  * @version 1.6 May 05, 2022 - Added methods for adding instructions to recipes and submenu
  * for viewing instructions, added Quit option to loading recipe file menu option
+ * @version 1.7 May 07, 2022 - Added methods to find and specify skipping repeat recipes during
+ * merge between loaded and current recipe lists, updated addIngredient method to reflect
+ * new Ingredient unit field, added Hashtables to track same name recipes and methods to map
+ * the repeating recipes
  */
 
 import java.util.ArrayList;
 import java.io.*;
 import java.util.Scanner;
+import java.util.Hashtable;
 
 public class CookBookDriver implements Serializable
 {
@@ -53,6 +58,8 @@ public class CookBookDriver implements Serializable
     private String typeChoice;
     private Scanner inScan;
     private boolean invalid;
+    private Hashtable<BasicRecipe, Integer> repeatCurrentRecipes;
+    private Hashtable<BasicRecipe, Integer> repeatLoadedRecipes;
     // file IO fields:
     BufferedReader inFile; // recipe text file reader
     DataOutputStream outFile; // recipe data file writer
@@ -295,6 +302,7 @@ public class CookBookDriver implements Serializable
         {
             String ingredientName = "";
             Double ingredientAmount = 0.0;
+            String ingredientUnit = "";
             System.out.print("Please enter the ingredient name: ");
             if(inScan.hasNextLine())
             {
@@ -305,9 +313,14 @@ public class CookBookDriver implements Serializable
             {
                 ingredientAmount = inScan.nextDouble();
             }
+            System.out.print("Please enter the measurement unit (grams, cups, etc.): ");
+            if(inScan.hasNextLine())
+            {
+                ingredientUnit = inScan.nextLine();
+            }
             System.out.println("Adding new ingredient: " + ingredientName 
                 + " " + ingredientAmount);
-            newRecipe.addNewIngredient(ingredientName, ingredientAmount);
+            newRecipe.addNewIngredient(ingredientName, ingredientAmount, ingredientUnit);
         }
     }
     
@@ -362,7 +375,7 @@ public class CookBookDriver implements Serializable
     }
     
     
-    //Recipe Lists method:
+    //Recipe Lists methods:
     /** merge current recipes ArrayList with loaded recipes ArrayList
      * newRecipeBatch added to currentRecipes
      */
@@ -374,8 +387,15 @@ public class CookBookDriver implements Serializable
                 + " current recipes...");
             for(int index = 0; index < newRecipeBatch.size(); index++)
             {
-                currentRecipes.add(newRecipeBatch.get(index));
-                numRecipes++;
+                if(matchesCurrentRecipe(newRecipeBatch.get(index).getTitle(), currentRecipes))
+                {
+                    skipOrAddRecipe(newRecipeBatch.get(index));
+                }
+                else
+                {
+                    currentRecipes.add(newRecipeBatch.get(index));
+                    numRecipes++;
+                }
             }
             System.out.println("Changes only apply to current recipes list."
             + "\nTo keep changes after exit, please save current recipes list.");
@@ -383,6 +403,45 @@ public class CookBookDriver implements Serializable
         else
         {
             System.out.println("There are no loaded recipes to merge.");
+        }
+    }
+    
+    /** check if recipe in loaded recipes shares title with recipe in current recipes
+     * @param recipeTitle (Str) - title of recipe in loaded recipes list
+     * @param currentRecipesList (ArrayList<basicRecipe>) - list of current recipes
+     * @return boolean - true if recipe title matches
+     */
+    public boolean matchesCurrentRecipe(String recipeTitle, ArrayList<BasicRecipe>
+                                                                    currentRecipesList)
+    {
+        for(int index = 0; index < currentRecipesList.size(); index++)
+        {
+            if(currentRecipesList.get(index).getTitle().toUpperCase().equals(
+                                                            recipeTitle.toUpperCase()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /** ask to skip duplicate recipe, add recipe if merging, skip recipe if not
+     * @param recipe (BasicRecipe) - recipe to skip or add to current recipes list
+     */
+    public void skipOrAddRecipe(BasicRecipe recipe)
+    {
+        System.out.println("Found a duplicate recipe:"
+            +"\nA recipe titled " + recipe.getTitle()
+            + " already exists in current recipes.");
+        System.out.print("Merge this recipe anyway (Y/N): ");
+        if(getYesNo().equals("N"))
+        {
+            System.out.println(" \n Recipe skipped.");
+        }
+        else
+        {
+            currentRecipes.add(recipe);
+            numRecipes++;
         }
     }
     
@@ -440,6 +499,45 @@ public class CookBookDriver implements Serializable
         }
     }
     
+    // find reduntant recipes in current and loaded recipe lists methods
+    /** create map of recipes with same title in current recipes list
+     * @param recipeTitle (Str) - title of desired recipe
+     * @return repeatCurrentRecipes (Hashtable<BasicRecipe, Integer>) - 
+     * map of recipes with same title and their respective indices
+     */
+    public Hashtable<BasicRecipe, Integer> findMatchedCurrentRecipes(String recipeTitle)
+    {
+        repeatCurrentRecipes = new Hashtable<BasicRecipe, Integer>();
+        for(int index = 0; index < currentRecipes.size(); index++)
+        {
+            if(currentRecipes.get(index).getTitle().toLowerCase().equals(recipeTitle))
+            {
+                repeatCurrentRecipes.put(currentRecipes.get(index), new Integer(index));
+            }
+        }
+        return repeatCurrentRecipes;
+    }
+    
+    /** create a map of recipes with same title in loaded recipes list
+     * @param recipeTitle(Str) - title of desired recipe
+     * @return matchedLoadedRecipes (ArrayList<BasicRecipe>) - 
+     * map of recipes matching title
+     */
+    public Hashtable<BasicRecipe, Integer> findMatchedLoadedRecipes(String recipeTitle)
+    {
+        repeatLoadedRecipes = new Hashtable<BasicRecipe, Integer>();
+        for(int index = 0; index < newRecipeBatch.size(); index++)
+        {
+            if(newRecipeBatch.get(index).getTitle().toLowerCase().equals(recipeTitle))
+            {
+                repeatLoadedRecipes.put(newRecipeBatch.get(index), new Integer(index));
+            }
+        }
+        return repeatLoadedRecipes;
+    }
+    
+    
+    //recipe manipulation methods:
     /**get recipe title input
      * @return recipeTitle (Str) - lowercase recipe title
      */
