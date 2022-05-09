@@ -4,26 +4,41 @@
  *
  * @author Maria Jackson
  * @version 1.0 Apr 22, 2022
+ * 
  * @version 1.1 Apr 23, 2022 - added method to store recipes as data with DataOutputStream
  * object. Added methods to read recipe data file and print the information.
  * Tested functions in main().
+ * 
  * @version 1.2 Apr 26, 2022 - added documentation to existing methods, added Serializable 
  * implementation for ObjectOutput/InputStream classes: can now write/read binary files to
  * save/read recipe objects, will replace item-by-item methods of v1.1, added 
  * displayRecipes() method: streamlined organization & display of recipe info, respective
  * fields added
+ * 
  * @version 1.3 Apr 27, 2022 - added menu/selection functionality, organized fields/methods
+ * 
  * @version 1.4 Apr 28, 2022 - added menu options for saving/loading recipe files & their
  * respective methods, added menu option for merging loaded recipes with new recipes,
  * modulated menu options 1-7 more clearly.
+ * 
  * @version 1.5 May 02, 2022 - added methods for searching recipes and deleting recipes,
  * added setting ingredients functionality to creating new recipe with submenus
+ * 
  * @version 1.6 May 05, 2022 - Added methods for adding instructions to recipes and submenu
  * for viewing instructions, added Quit option to loading recipe file menu option
+ * 
  * @version 1.7 May 07, 2022 - Added methods to find and specify skipping repeat recipes during
  * merge between loaded and current recipe lists, updated addIngredient method to reflect
  * new Ingredient unit field, added Hashtables to track same name recipes and methods to map
  * the repeating recipes
+ * 
+ * @version 1.8 May 08, 2022 - Polished the methods to track recipes sharing same title with
+ * hashtables, added new method to display all matching recipes to menu option 7 instead of the
+ * first search result only
+ * 
+ * Still need to: error test bad ingredient amount input, add functionality that produces
+ * all matching title search results to delete recipes, add possible option to change title or
+ * delete repeat recipes during merge in addition to current skip option
  */
 
 import java.util.ArrayList;
@@ -317,9 +332,13 @@ public class CookBookDriver implements Serializable
             if(inScan.hasNextLine())
             {
                 ingredientUnit = inScan.nextLine();
+                if(ingredientUnit.equals(""))
+                {
+                    ingredientUnit = inScan.nextLine();
+                }
             }
             System.out.println("Adding new ingredient: " + ingredientName 
-                + " " + ingredientAmount);
+                + " " + ingredientAmount + " " + ingredientUnit);
             newRecipe.addNewIngredient(ingredientName, ingredientAmount, ingredientUnit);
         }
     }
@@ -496,6 +515,41 @@ public class CookBookDriver implements Serializable
         else
         {
             System.out.println("Sorry, no recipe by that title exists");
+        }
+    }
+    
+    
+    /** get title, find all recipes that share the title
+     * search current and loaded recipes lists for matching title, provide all results
+     */
+    public void findAllRecipesWithTitle()
+    {
+        String title = getTitleInput();
+        Hashtable<BasicRecipe, Integer> currentListMatches = null;
+        Hashtable<BasicRecipe, Integer> loadedListMatches = null;
+        if(!currentRecipes.isEmpty() && recipeInCurrentRecipes(title))
+        {
+            currentListMatches = findMatchedCurrentRecipes(title);
+            if(currentListMatches != null)
+            {
+                System.out.println(" \n"+"Found " + currentListMatches.size()
+                    + " recipe(s) by that title in current recipes:");
+                displayRecipeFromHashTable(currentListMatches);
+            }
+        }
+        if(!newRecipeBatch.isEmpty() && recipeInNewRecipeBatch(title))
+        {
+            loadedListMatches = findMatchedLoadedRecipes(title);
+            if(loadedListMatches != null)
+            {
+                System.out.println(" \n"+"Found " + loadedListMatches.size()
+                    + " recipe(s) by that title in loaded recipes list:");
+                displayRecipeFromHashTable(loadedListMatches);
+            }
+        }
+        if(!recipeInCurrentRecipes(title) && !recipeInNewRecipeBatch(title))
+        {
+            System.out.println(" \nNo recipe with that title exists.");
         }
     }
     
@@ -684,7 +738,7 @@ public class CookBookDriver implements Serializable
             for(int i = 0; i < ingredients.size(); i++)
             {
                 recipeDetails += "       " + ingredients.get(i).getName() + ": "
-                                    + ingredients.get(i).getAmount() + "\n";
+                    + ingredients.get(i).getAmount() + ingredients.get(i).getUnit()+ "\n";
             }
             System.out.println("\n" + recipe.getTitle() + ": \n" + "   Ingredients: \n"
                 + recipeDetails + "\n   " + recipe.getCookingTime());
@@ -711,11 +765,33 @@ public class CookBookDriver implements Serializable
         for(int i = 0; i < ingredients.size(); i++)
         {
             recipeDetails += "       " + ingredients.get(i).getName() + ":"
-                                + ingredients.get(i).getAmount() + "\n";
+                    + ingredients.get(i).getAmount() + ingredients.get(1).getUnit()+ "\n";
         }
         System.out.println(recipe.getTitle() + ": \n" + "   Ingredients: \n"
             + recipeDetails + "\n   " + recipe.getCookingTime());
         displayInstructions(recipe);
+    }
+    
+    /** display recipes from hashtable
+     * 
+     */
+    public void displayRecipeFromHashTable(Hashtable<BasicRecipe, Integer> listOfMatches)
+    {
+        String recipeDetails = "";
+        BasicRecipe recipe = null;
+        for(BasicRecipe r : listOfMatches.keySet())
+        {
+            recipe = r;
+            ArrayList<Ingredient> ingredients = recipe.getIngredients();
+            for(int i = 0; i < ingredients.size(); i++)
+            {
+                recipeDetails += "       " + ingredients.get(i).getName() + ": "
+                    + ingredients.get(i).getAmount() +" "+ ingredients.get(1).getUnit()+ "\n";
+            }
+            System.out.println(recipe.getTitle() + ": \n" + "   Ingredients: \n"
+                + recipeDetails + "\n   " + recipe.getCookingTime());
+            displayInstructions(recipe);
+        }
     }
     
     /** get display instructions choice
@@ -768,7 +844,7 @@ public class CookBookDriver implements Serializable
         ArrayList<BasicRecipe> inRecipeBatch = new ArrayList<BasicRecipe>();
         if(filename.equals("Q"))
         {
-            return null;
+            return inRecipeBatch;
         }
         try
         {
@@ -826,7 +902,7 @@ public class CookBookDriver implements Serializable
     public void loadRecipeList()
     {
         newRecipeBatch = readRecipeArrayListFile(getValidFilename());
-        if(newRecipeBatch == null)
+        if(newRecipeBatch.isEmpty())
         {
             System.out.println("Cancelled loading recipe file.");
         }
@@ -906,8 +982,8 @@ public class CookBookDriver implements Serializable
             }
             else if(c.menuChoice.equals("5")) // view loaded recipes
             {
-                if(c.newRecipeBatch.size() <1) // no recipes in new recipe batch list
-                {
+                if( c.newRecipeBatch.size() <1) 
+                {   // no recipes in new recipe batch list
                     System.out.println("There are no recipes from loaded file");
                 }
                 else // at least one recipe in new batch list
@@ -924,7 +1000,8 @@ public class CookBookDriver implements Serializable
                 if((c.currentRecipes != null && c.currentRecipes.size() > 0) || 
                         (c.newRecipeBatch != null && c.newRecipeBatch.size() > 0))
                 {
-                    c.findRecipeByTitle(); // get title, search lists, display recipe
+                    //c.findRecipeByTitle(); // get title, search lists, display recipe
+                    c.findAllRecipesWithTitle(); //get title search lists, display all results
                 }
                 else
                 {
