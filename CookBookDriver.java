@@ -36,6 +36,9 @@
  * hashtables, added new method to display all matching recipes to menu option 7 instead of the
  * first search result only
  * 
+ * @version 1.9 May 09, 2022 - Edited program to eliminate redundant or unnecessary code,
+ * shortened many of the iteration-based methods from using indices to for each loops
+ * 
  * Still need to: error test bad ingredient amount input, add functionality that produces
  * all matching title search results to delete recipes, add possible option to change title or
  * delete repeat recipes during merge in addition to current skip option
@@ -299,13 +302,9 @@ public class CookBookDriver implements Serializable
      */
     public boolean addingIngredient()
     {
-        yesNoChoice = "";
-        System.out.print(" \n" + "Would you like to add an ingredient (Y/N): ");
-        if(getYesNo().equals("Y"))
-        {
-            return true;
-        }
-        return false;
+        yesNoChoice = ""; //reset yes/no choice
+        System.out.print(" \n" + "Would you like to add an ingredient (Y/N): ");//prompt input
+        return getYesNo().equals("Y"); // get y/n input & return true if yes, false if no
     }
     
     /** get ingredient name and amount for new recipe, set new ingredient
@@ -349,11 +348,7 @@ public class CookBookDriver implements Serializable
     public boolean addingInstructions()
     {
         System.out.print(" \n"+"Would you like to add instructions for this recipe (Y/N): ");
-        if(getYesNo().equals("Y"))
-        {
-            return true;
-        }
-        return false;
+        return getYesNo().equals("Y"); // get y/n input; return true if yes, false if no
     }
     
     /** get choice, add insructions to new recipe step by step
@@ -404,15 +399,15 @@ public class CookBookDriver implements Serializable
         {
             System.out.println("Merging " + newRecipeBatch.size() + " recipes with"
                 + " current recipes...");
-            for(int index = 0; index < newRecipeBatch.size(); index++)
+            for(BasicRecipe recipe : newRecipeBatch)
             {
-                if(matchesCurrentRecipe(newRecipeBatch.get(index).getTitle(), currentRecipes))
+                if(matchesCurrentRecipe(recipe.getTitle(), currentRecipes))
                 {
-                    skipOrAddRecipe(newRecipeBatch.get(index));
+                    skipOrAddRecipe(recipe);
                 }
                 else
                 {
-                    currentRecipes.add(newRecipeBatch.get(index));
+                    currentRecipes.add(recipe);
                     numRecipes++;
                 }
             }
@@ -433,10 +428,9 @@ public class CookBookDriver implements Serializable
     public boolean matchesCurrentRecipe(String recipeTitle, ArrayList<BasicRecipe>
                                                                     currentRecipesList)
     {
-        for(int index = 0; index < currentRecipesList.size(); index++)
+        for(BasicRecipe recipe : currentRecipesList)
         {
-            if(currentRecipesList.get(index).getTitle().toUpperCase().equals(
-                                                            recipeTitle.toUpperCase()))
+            if(recipe.getTitle().toUpperCase().equals(recipeTitle.toUpperCase()))
             {
                 return true;
             }
@@ -470,9 +464,9 @@ public class CookBookDriver implements Serializable
      */
     public boolean recipeInCurrentRecipes(String recipeTitle)
     {
-        for(int index = 0; index < currentRecipes.size(); index++)
+        for(BasicRecipe recipe : currentRecipes)
         {
-            if(currentRecipes.get(index).getTitle().toLowerCase().equals(recipeTitle))
+            if(recipe.getTitle().toLowerCase().equals(recipeTitle))
             {
                 return true;
             }
@@ -486,9 +480,9 @@ public class CookBookDriver implements Serializable
      */
     public boolean recipeInNewRecipeBatch(String recipeTitle)
     {
-        for(int index = 0; index < newRecipeBatch.size(); index++)
+        for(BasicRecipe recipe : newRecipeBatch)
         {
-            if(newRecipeBatch.get(index).getTitle().toLowerCase().equals(recipeTitle))
+            if(recipe.getTitle().toLowerCase().equals(recipeTitle))
             {
                 return true;
             }
@@ -612,11 +606,11 @@ public class CookBookDriver implements Serializable
      */
     public void deleteRecipe(ArrayList<BasicRecipe> recipeList, String recipeTitle)
     {
-        for(int index = 0; index < recipeList.size(); index++)
+        for(BasicRecipe recipe : recipeList)
         {
-            if(recipeList.get(index).getTitle().toLowerCase().equals(recipeTitle))
+            if(recipe.getTitle().toLowerCase().equals(recipeTitle))
             {
-                recipeList.remove(recipeList.get(index));
+                recipeList.remove(recipe);
             }
         }
     }
@@ -710,9 +704,9 @@ public class CookBookDriver implements Serializable
         try
         {
             outObject = new ObjectOutputStream( new FileOutputStream( filename ));
-            for(int index = 0; index < currentRecipes.size(); index++)
+            for(BasicRecipe recipe : currentRecipes)
             {
-                outObject.writeObject(currentRecipes.get(index));
+                outObject.writeObject(recipe);
             }
             outObject.close();
         }
@@ -730,19 +724,18 @@ public class CookBookDriver implements Serializable
     public void displayRecipes(ArrayList<BasicRecipe> recipeArr)
     {
         System.out.println("Displaying " + recipeArr.size() + " recipes: ");
-        for(int index = 0; index < recipeArr.size(); index++)
+        for(BasicRecipe r : recipeArr)
         {
-            BasicRecipe recipe = recipeArr.get(index);
+            BasicRecipe recipe = r;
             String recipeDetails = "";
             ArrayList<Ingredient> ingredients = recipe.getIngredients();
-            for(int i = 0; i < ingredients.size(); i++)
+            for(Ingredient i : ingredients)
             {
-                recipeDetails += "       " + ingredients.get(i).getName() + ": "
-                    + ingredients.get(i).getAmount() + ingredients.get(i).getUnit()+ "\n";
+                recipeDetails += "       " + i.getName() + ": "
+                    + i.getAmount() + i.getUnit()+ "\n";
             }
             System.out.println("\n" + recipe.getTitle() + ": \n" + "   Ingredients: \n"
                 + recipeDetails + "\n   " + recipe.getCookingTime());
-            
         }
     }
     
@@ -754,18 +747,18 @@ public class CookBookDriver implements Serializable
     {
         String recipeDetails = "";
         BasicRecipe recipe = null;
-        for(int index = 0; index < recipeList.size(); index++)
+        for(BasicRecipe r : recipeList)
         {
-            if(recipeList.get(index).getTitle().toLowerCase().equals(recipeTitle))
+            if(r.getTitle().toLowerCase().equals(recipeTitle))
             {
-                recipe = recipeList.get(index);
+                recipe = r;
             }
         }
         ArrayList<Ingredient> ingredients = recipe.getIngredients();
-        for(int i = 0; i < ingredients.size(); i++)
+        for(Ingredient i : ingredients)
         {
-            recipeDetails += "       " + ingredients.get(i).getName() + ":"
-                    + ingredients.get(i).getAmount() + ingredients.get(1).getUnit()+ "\n";
+            recipeDetails += "       " + i.getName() + ":"
+                    + i.getAmount() + i.getUnit()+ "\n";
         }
         System.out.println(recipe.getTitle() + ": \n" + "   Ingredients: \n"
             + recipeDetails + "\n   " + recipe.getCookingTime());
@@ -783,10 +776,10 @@ public class CookBookDriver implements Serializable
         {
             recipe = r;
             ArrayList<Ingredient> ingredients = recipe.getIngredients();
-            for(int i = 0; i < ingredients.size(); i++)
+            for(Ingredient i : ingredients)
             {
-                recipeDetails += "       " + ingredients.get(i).getName() + ": "
-                    + ingredients.get(i).getAmount() +" "+ ingredients.get(1).getUnit()+ "\n";
+                recipeDetails += "       " + i.getName() + ": "
+                    + i.getAmount() +" "+ i.getUnit()+ "\n";
             }
             System.out.println(recipe.getTitle() + ": \n" + "   Ingredients: \n"
                 + recipeDetails + "\n   " + recipe.getCookingTime());
@@ -800,11 +793,7 @@ public class CookBookDriver implements Serializable
     public boolean needInstructions()
     {
         System.out.print(" \n"+"Do you want to view this recipe's instructions (Y/N): ");
-        if(getYesNo().equals("Y"))
-        {
-            return true;
-        }
-        return false;
+        return getYesNo().equals("Y"); // get y/n input; return true if yes, false if no
     }
     
     /** display recipe instructions with listed Step numbers
