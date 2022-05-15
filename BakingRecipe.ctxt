@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=BakingRecipe
-comment0.text=BakingRecipe.java\r\n\ This\ class\ holds\ the\ details\ for\ a\ baking\ recipe\r\n\r\n\ @author\ Maria\ Jackson\r\n\ @version\ 1.0\ Apr\ 22,\ 2022\r\n\ @version\ 1.1\ Apr\ 23,\ 2022\ -\ Added\ constructors\ with\ calls\ to\ super(),\ added\ getter\ \r\n\ &\ setter\ for\ bakeTime\r\n\ @version\ 1.2\ Apr\ 26,\ 2022\ -\ now\ inherits\ Serializable\ implementation\ from\ super,\ added\r\n\ override\ of\ super's\ abstract\ getCookingTime\ method,\ removed\ bakeTime\ field\:\ redundant.\r\n\ @version\ 1.3\ May\ 05,\ 2022\ -\ Added\ documentation,\ removed\ bakeTime\ field\r\n
+comment0.text=BakingRecipe.java\r\n\ This\ class\ holds\ the\ details\ for\ a\ baking\ recipe\r\n\r\n\ @author\ Maria\ Jackson\r\n\ @version\ 1.0\ Apr\ 22,\ 2022\r\n\ \r\n\ @version\ 1.1\ Apr\ 23,\ 2022\ -\ Added\ constructors\ with\ calls\ to\ super(),\ added\ getter\ \r\n\ &\ setter\ for\ bakeTime\r\n\ \r\n\ @version\ 1.2\ Apr\ 26,\ 2022\ -\ now\ inherits\ Serializable\ implementation\ from\ super,\ added\r\n\ override\ of\ super's\ abstract\ getCookingTime\ method,\ removed\ bakeTime\ field\:\ redundant.\r\n\ \r\n\ @version\ 1.3\ May\ 05,\ 2022\ -\ Added\ documentation,\ removed\ bakeTime\ field\r\n
 comment1.params=
 comment1.target=BakingRecipe()
 comment1.text=\ default\ constructor\r\n\ calls\ super's\ default\ constructor\r\n

@@ -4,12 +4,16 @@
  *
  * @author Maria Jackson
  * @version 1.0 Apr 22, 2022
+ * 
  * @version 1.1 Apr 23, 2022 - Added getters and setters for fields, added getIngredients
  * method: allows access to entire ArrayList of ingredients.
+ * 
  * @version 1.2 Apr 26, 2022 - Added Serializable implementation, added abstract
  * getCookingTime() method
+ * 
  * @version 1.3 May 05, 2022 - Added instructions field and accompanying get & set methods,
  * added documentation, added method to add step to instructions
+ * 
  * @version 1.4 May 07, 2022 - Updated addIngredient method to reflect new unit field
  */
 import java.util.ArrayList;
@@ -87,6 +91,17 @@ public abstract class BasicRecipe implements Serializable
        for(int index = 0; index < allIngredients.size(); index++)
        {
            organizedIngredients += String.valueOf(allIngredients.get(index)) + "\n";
+       }
+       return title + "\n\t" + allIngredients;
+    }
+    
+    public String getFullRecipeWithForEach()
+    {
+       String organizedIngredients = "";
+       ArrayList<Ingredient> allIngredients = getIngredients();
+       for(Ingredient i : allIngredients)
+       {
+           organizedIngredients += String.valueOf(i) + "\n";
        }
        return title + "\n\t" + allIngredients;
     }

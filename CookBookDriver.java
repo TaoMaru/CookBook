@@ -39,6 +39,9 @@
  * @version 1.9 May 09, 2022 - Edited program to eliminate redundant or unnecessary code,
  * shortened many of the iteration-based methods from using indices to for each loops
  * 
+ * @version 1.10 May 12, 2022 - Refactored menu option 8 to utilize hastables, allows new
+ * selection process of a specific recipe and/or cancel when deleting a recipe
+ * 
  * Still need to: error test bad ingredient amount input, add functionality that produces
  * all matching title search results to delete recipes, add possible option to change title or
  * delete repeat recipes during merge in addition to current skip option
@@ -55,6 +58,10 @@ public class CookBookDriver implements Serializable
     private static int numRecipes; // number of recipes
     private ArrayList<BasicRecipe> currentRecipes; // recipes made in session
     private BasicRecipe newRecipe; // current recipe being made
+    private String greeting = "Hey, Good Cookin'!"
+            + "\nWelcome to the Virtual CookBook!"
+            + "\nHere you can create, delete, save, and "
+            + "\nload your recipes!";
     private String menu = "\nCookBook Menu"
         + "\n1 - Add a new recipe"
         + "\n2 - View current recipes"
@@ -112,10 +119,7 @@ public class CookBookDriver implements Serializable
      */
     public void displayGreeting()
     {
-        System.out.println("Hey, Good Cookin'!"
-            + "\nWelcome to the Virtual CookBook!"
-            + "\nHere you can create, delete, save, and "
-            + "\nload your recipes!");
+        System.out.println(" \n"+greeting);
     }
     
     /** display recipe type options
@@ -637,6 +641,142 @@ public class CookBookDriver implements Serializable
         }
     }
     
+    /** find recipe by title, display delete options, delete recipe (menu option 8)
+     * 
+     */
+    public void deleteRecipeOption()
+    {
+        invalid = false;
+        Hashtable<BasicRecipe, Integer> currentRecipeMatches = 
+                                                        new Hashtable<BasicRecipe, Integer>();
+        Hashtable<BasicRecipe, Integer> loadedRecipeMatches =
+                                                        new Hashtable<BasicRecipe, Integer>();
+        String title = getTitleInput();
+        currentRecipeMatches = findMatchedCurrentRecipes(title);
+        loadedRecipeMatches = findMatchedLoadedRecipes(title);
+        int currentMatches = currentRecipeMatches.size();
+        int loadedMatches = loadedRecipeMatches.size();
+        //int[] allMatches = {};
+        Integer recipeToDelete = null;
+        Hashtable<Integer, Integer> recipes = new Hashtable<Integer, Integer>();
+        if(currentMatches > 0)
+        {
+            if(loadedMatches > 0)
+            {
+                System.out.println(" \n"+"Found "
+                    + ( currentMatches+loadedMatches ) + " recipes by that title:");
+            }
+            else
+            {
+                System.out.println(" \n" + "Found " + currentMatches + " recipe(s)"
+                    + " in current recipe list:");
+                String recipeDetails = "";
+                BasicRecipe recipe = null;
+                int recipeNum = 0;
+                int recipeChoice = 0;
+                for(BasicRecipe r : currentRecipeMatches.keySet())
+                {
+                    recipeNum++;
+                    recipe = r;
+                    ArrayList<Ingredient> ingredients = recipe.getIngredients();
+                    for(Ingredient i : ingredients)
+                    {
+                        recipeDetails += "       " + i.getName() + ": "
+                            + i.getAmount() +" "+ i.getUnit()+ "\n";
+                    }
+                    System.out.println(recipeNum + " "
+                        + recipe.getTitle() + ": \n" + "   Ingredients: \n"
+                        + recipeDetails + "\n   " + recipe.getCookingTime());
+                    //displayInstructions(recipe);
+                    recipes.put(new Integer(recipeNum), currentRecipeMatches.get(recipe));
+                }
+                do
+                {
+                    System.out.print(" \n" + "Please enter the number of the recipe to delete:"
+                        + "\nOr 0 to cancel: ");
+                    if(inScan.hasNextInt())
+                    {
+                        recipeChoice = inScan.nextInt();
+                        recipeToDelete = new Integer(recipeChoice);
+                        if(recipes.containsKey(recipeToDelete))
+                        {
+                            recipeChoice = recipes.get(recipeToDelete).intValue();
+                            currentRecipes.remove(recipeChoice);
+                            invalid = false;
+                        }
+                        else
+                        {
+                            System.out.println("Invalid option");
+                            invalid = true;
+                        }
+                    }
+                }
+                while(invalid);
+            }
+        }
+        else if(loadedMatches > 0)
+        {
+            System.out.println(" \n" + "Found " + loadedMatches + " recipes"
+                + " in loaded recipes:");
+            String recipeDetails = "";
+            BasicRecipe recipe = null;
+            int recipeNum = 0;
+            int recipeChoice = 0;
+            for(BasicRecipe r : loadedRecipeMatches.keySet())
+            {
+                recipeNum++;
+                recipe = r;
+                ArrayList<Ingredient> ingredients = recipe.getIngredients();
+                for(Ingredient i : ingredients)
+                {
+                    recipeDetails += "       " + i.getName() + ": "
+                        + i.getAmount() +" "+ i.getUnit()+ "\n";
+                }
+                System.out.println(recipeNum + " "
+                    + recipe.getTitle() + ": \n" + "   Ingredients: \n"
+                    + recipeDetails + "\n   " + recipe.getCookingTime());
+                //displayInstructions(recipe);
+                recipes.put(new Integer(recipeNum), loadedRecipeMatches.get(recipe));
+            }
+            do
+            {
+                System.out.print(" \n" + "Please enter the number of the recipe to delete:"
+                    + "\nOr 0 to cancel: ");
+                if(inScan.hasNextInt())
+                {
+                    recipeChoice = inScan.nextInt();
+                    recipeToDelete = new Integer(recipeChoice);
+                    if(recipes.containsKey(recipeToDelete))
+                    {
+                        recipeChoice = recipes.get(recipeToDelete).intValue();
+                        newRecipeBatch.remove(recipeChoice);
+                        invalid = false;
+                    }
+                    else
+                    {
+                        System.out.println("Invalid option");
+                        invalid = true;
+                    }
+                }
+            }
+            while(invalid);
+        }
+        else
+        {
+            System.out.println(" \n" + "Couldn't find any recipes by that title.");
+        }
+    }
+    
+    public void displayCurrentRecipesByHashtable(Hashtable<BasicRecipe, Integer> recipeHashtable)
+    {
+        displayRecipeFromHashTable(recipeHashtable);
+    }
+    
+    public void displayLoadedRecipesByHashtable(Hashtable<BasicRecipe, Integer> recipeHashtable)
+    {
+        displayRecipeFromHashTable(recipeHashtable);
+    }
+    
     //String version of read recipes from file idea, unused, possibly obsolete
     /** get String version of recipes
      * @param filename (Str) - .txt file containing recipes
@@ -732,7 +872,7 @@ public class CookBookDriver implements Serializable
             for(Ingredient i : ingredients)
             {
                 recipeDetails += "       " + i.getName() + ": "
-                    + i.getAmount() + i.getUnit()+ "\n";
+                    + i.getAmount() +" "+ i.getUnit()+ "\n";
             }
             System.out.println("\n" + recipe.getTitle() + ": \n" + "   Ingredients: \n"
                 + recipeDetails + "\n   " + recipe.getCookingTime());
@@ -758,7 +898,7 @@ public class CookBookDriver implements Serializable
         for(Ingredient i : ingredients)
         {
             recipeDetails += "       " + i.getName() + ":"
-                    + i.getAmount() + i.getUnit()+ "\n";
+                    + i.getAmount() +" "+ i.getUnit()+ "\n";
         }
         System.out.println(recipe.getTitle() + ": \n" + "   Ingredients: \n"
             + recipeDetails + "\n   " + recipe.getCookingTime());

@@ -4,10 +4,14 @@
  *
  * @author Maria Jackson
  * @version 1.0 Apr 22, 2022
+ * 
  * @version 1.1 - Apr 23, 2022 - Added getters & setters for fields, and hasDetails()
+ * 
  * @version 1.2 Apr 26, 2022 - Added Seriablizable implementation (does not have declared
  * static final serial field, but works as a part of a recipe's ingredient collection)
+ * 
  * @version 1.3 May 04, 2022 - Added documentation for all methods.
+ * 
  * @version 1.4 May 07, 2022 -Added measurement unit field, updated constructors as needed,
  * added set/getter for unit
  */

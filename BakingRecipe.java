@@ -4,10 +4,13 @@
  *
  * @author Maria Jackson
  * @version 1.0 Apr 22, 2022
+ * 
  * @version 1.1 Apr 23, 2022 - Added constructors with calls to super(), added getter 
  * & setter for bakeTime
+ * 
  * @version 1.2 Apr 26, 2022 - now inherits Serializable implementation from super, added
  * override of super's abstract getCookingTime method, removed bakeTime field: redundant.
+ * 
  * @version 1.3 May 05, 2022 - Added documentation, removed bakeTime field
  */
 public class BakingRecipe extends BasicRecipe

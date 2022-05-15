@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=CookingRecipe
-comment0.text=CookingRecipe.java\r\n\ This\ class\ holds\ the\ details\ for\ a\ cooking\ recipe\r\n\r\n\ @author\ Maria\ Jackson\r\n\ @version\ 1.0\ Apr\ 22,\ 2022\ -\ Constructor\ and\ getFullRecipe()\ methods\r\n\ @version\ 1.2\ Apr\ 26,\ 2022\ -\ added\ override\ of\ super's\ abstract\ getCookingTime()\ method,\r\n\ now\ inherits\ Serializable\ implementation\r\n\ @version\ 1.3\ May\ 05,\ 2022\ -\ added\ documentation\r\n
+comment0.text=CookingRecipe.java\r\n\ This\ class\ holds\ the\ details\ for\ a\ cooking\ recipe\r\n\r\n\ @author\ Maria\ Jackson\r\n\ @version\ 1.0\ Apr\ 22,\ 2022\ -\ Constructor\ and\ getFullRecipe()\ methods\r\n\ \r\n\ @version\ 1.2\ Apr\ 26,\ 2022\ -\ added\ override\ of\ super's\ abstract\ getCookingTime()\ method,\r\n\ now\ inherits\ Serializable\ implementation\r\n\ \r\n\ @version\ 1.3\ May\ 05,\ 2022\ -\ added\ documentation\r\n
 comment1.params=
 comment1.target=CookingRecipe()
 comment1.text=\ default\ constructor\r\n\ calls\ super's\ default\ constructor\r\n
