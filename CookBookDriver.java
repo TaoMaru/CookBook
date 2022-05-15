@@ -42,9 +42,13 @@
  * @version 1.10 May 12, 2022 - Refactored menu option 8 to utilize hastables, allows new
  * selection process of a specific recipe and/or cancel when deleting a recipe
  * 
- * Still need to: error test bad ingredient amount input, add functionality that produces
- * all matching title search results to delete recipes, add possible option to change title or
- * delete repeat recipes during merge in addition to current skip option
+ * @version 1.11 May 15, 2022 - Continued modification of menu option 8: all matching titles
+ * listed with option to delete specific recipe by number, works as intended; found an issue
+ * in searching titles where ingredients from first recipe are displayed with the next in list
+ * 
+ * Still need to: error test bad ingredient amount input, add possible option to change title or
+ * delete repeat recipes during merge in addition to current skip option, fix repeat ingredient
+ * bug when searching titles
  */
 
 import java.util.ArrayList;
@@ -661,60 +665,57 @@ public class CookBookDriver implements Serializable
         Hashtable<Integer, Integer> recipes = new Hashtable<Integer, Integer>();
         if(currentMatches > 0)
         {
-            if(loadedMatches > 0)
+            System.out.println(" \n" + "Found " + currentMatches + " recipe(s)"
+                + " in current recipe list:");
+            String recipeDetails = "";
+            BasicRecipe recipe = null;
+            int recipeNum = 0;
+            int recipeChoice = 0;
+            for(BasicRecipe r : currentRecipeMatches.keySet())
             {
-                System.out.println(" \n"+"Found "
-                    + ( currentMatches+loadedMatches ) + " recipes by that title:");
-            }
-            else
-            {
-                System.out.println(" \n" + "Found " + currentMatches + " recipe(s)"
-                    + " in current recipe list:");
-                String recipeDetails = "";
-                BasicRecipe recipe = null;
-                int recipeNum = 0;
-                int recipeChoice = 0;
-                for(BasicRecipe r : currentRecipeMatches.keySet())
+                recipeNum++;
+                recipe = r;
+                ArrayList<Ingredient> ingredients = recipe.getIngredients();
+                for(Ingredient i : ingredients)
                 {
-                    recipeNum++;
-                    recipe = r;
-                    ArrayList<Ingredient> ingredients = recipe.getIngredients();
-                    for(Ingredient i : ingredients)
-                    {
-                        recipeDetails += "       " + i.getName() + ": "
-                            + i.getAmount() +" "+ i.getUnit()+ "\n";
-                    }
-                    System.out.println(recipeNum + " "
-                        + recipe.getTitle() + ": \n" + "   Ingredients: \n"
-                        + recipeDetails + "\n   " + recipe.getCookingTime());
-                    //displayInstructions(recipe);
-                    recipes.put(new Integer(recipeNum), currentRecipeMatches.get(recipe));
+                    recipeDetails += "       " + i.getName() + ": "
+                        + i.getAmount() +" "+ i.getUnit()+ "\n";
                 }
-                do
+                System.out.println(recipeNum + " "
+                    + recipe.getTitle() + ": \n" + "   Ingredients: \n"
+                    + recipeDetails + "\n   " + recipe.getCookingTime());
+                //displayInstructions(recipe);
+                recipes.put(new Integer(recipeNum), currentRecipeMatches.get(recipe));
+            }
+            do
+            {
+                System.out.print(" \n" + "Please enter the number of the recipe to delete:"
+                    + "\nOr 0 to cancel: ");
+                if(inScan.hasNextInt())
                 {
-                    System.out.print(" \n" + "Please enter the number of the recipe to delete:"
-                        + "\nOr 0 to cancel: ");
-                    if(inScan.hasNextInt())
+                    recipeChoice = inScan.nextInt();
+                    recipeToDelete = new Integer(recipeChoice);
+                    if(recipes.containsKey(recipeToDelete))
                     {
-                        recipeChoice = inScan.nextInt();
-                        recipeToDelete = new Integer(recipeChoice);
-                        if(recipes.containsKey(recipeToDelete))
-                        {
-                            recipeChoice = recipes.get(recipeToDelete).intValue();
-                            currentRecipes.remove(recipeChoice);
-                            invalid = false;
-                        }
-                        else
-                        {
-                            System.out.println("Invalid option");
-                            invalid = true;
-                        }
+                        recipeChoice = recipes.get(recipeToDelete).intValue();
+                        currentRecipes.remove(recipeChoice);
+                        invalid = false;
+                    }
+                    else if(recipeChoice == 0)
+                    {
+                        invalid = false;
+                        System.out.println("Delete cancelled.");
+                    }
+                    else
+                    {
+                        System.out.println("Invalid option");
+                        invalid = true;
                     }
                 }
-                while(invalid);
             }
+            while(invalid);
         }
-        else if(loadedMatches > 0)
+        if(loadedMatches > 0)
         {
             System.out.println(" \n" + "Found " + loadedMatches + " recipes"
                 + " in loaded recipes:");
@@ -751,6 +752,11 @@ public class CookBookDriver implements Serializable
                         recipeChoice = recipes.get(recipeToDelete).intValue();
                         newRecipeBatch.remove(recipeChoice);
                         invalid = false;
+                    }
+                    else if(recipeChoice == 0)
+                    {
+                        invalid = false;
+                        System.out.println("Delete cancelled.");
                     }
                     else
                     {
@@ -1142,7 +1148,9 @@ public class CookBookDriver implements Serializable
                 if((c.currentRecipes != null && c.currentRecipes.size() >0) ||
                         (c.newRecipeBatch != null && c.newRecipeBatch.size() > 0))
                 {
-                    c.findAndDeleteRecipe(); // get title, search lists, delete recipe
+                    //c.findAndDeleteRecipe(); // get title, search lists, delete recipe
+                    // get title, search lists for all matching recipes, get recipe choice
+                    c.deleteRecipeOption();
                 }
                 else
                 {
