@@ -46,9 +46,12 @@
  * listed with option to delete specific recipe by number, works as intended; found an issue
  * in searching titles where ingredients from first recipe are displayed with the next in list
  * 
+ * @version 1.12 May 15, 2022 - fixed issue regarding the display of extra ingredients in delete
+ * recipe and search recipes menu options, refactored menu option 8 to be more concise, 
+ * eliminated redundant code and functionality made more modular
+ * 
  * Still need to: error test bad ingredient amount input, add possible option to change title or
- * delete repeat recipes during merge in addition to current skip option, fix repeat ingredient
- * bug when searching titles
+ * delete repeat recipes during merge in addition to current skip option
  */
 
 import java.util.ArrayList;
@@ -660,112 +663,18 @@ public class CookBookDriver implements Serializable
         loadedRecipeMatches = findMatchedLoadedRecipes(title);
         int currentMatches = currentRecipeMatches.size();
         int loadedMatches = loadedRecipeMatches.size();
-        //int[] allMatches = {};
+        //display all matched recipes and get input for specific recipe to delete:
         Integer recipeToDelete = null;
         Hashtable<Integer, Integer> recipes = new Hashtable<Integer, Integer>();
         if(currentMatches > 0)
         {
-            System.out.println(" \n" + "Found " + currentMatches + " recipe(s)"
-                + " in current recipe list:");
-            String recipeDetails = "";
-            BasicRecipe recipe = null;
-            int recipeNum = 0;
-            int recipeChoice = 0;
-            for(BasicRecipe r : currentRecipeMatches.keySet())
-            {
-                recipeNum++;
-                recipe = r;
-                ArrayList<Ingredient> ingredients = recipe.getIngredients();
-                for(Ingredient i : ingredients)
-                {
-                    recipeDetails += "       " + i.getName() + ": "
-                        + i.getAmount() +" "+ i.getUnit()+ "\n";
-                }
-                System.out.println(recipeNum + " "
-                    + recipe.getTitle() + ": \n" + "   Ingredients: \n"
-                    + recipeDetails + "\n   " + recipe.getCookingTime());
-                //displayInstructions(recipe);
-                recipes.put(new Integer(recipeNum), currentRecipeMatches.get(recipe));
-            }
-            do
-            {
-                System.out.print(" \n" + "Please enter the number of the recipe to delete:"
-                    + "\nOr 0 to cancel: ");
-                if(inScan.hasNextInt())
-                {
-                    recipeChoice = inScan.nextInt();
-                    recipeToDelete = new Integer(recipeChoice);
-                    if(recipes.containsKey(recipeToDelete))
-                    {
-                        recipeChoice = recipes.get(recipeToDelete).intValue();
-                        currentRecipes.remove(recipeChoice);
-                        invalid = false;
-                    }
-                    else if(recipeChoice == 0)
-                    {
-                        invalid = false;
-                        System.out.println("Delete cancelled.");
-                    }
-                    else
-                    {
-                        System.out.println("Invalid option");
-                        invalid = true;
-                    }
-                }
-            }
-            while(invalid);
+            listMatchesAndDeleteRecipe(currentMatches, "current", currentRecipeMatches,
+                                                    recipeToDelete, recipes, currentRecipes);
         }
         if(loadedMatches > 0)
         {
-            System.out.println(" \n" + "Found " + loadedMatches + " recipes"
-                + " in loaded recipes:");
-            String recipeDetails = "";
-            BasicRecipe recipe = null;
-            int recipeNum = 0;
-            int recipeChoice = 0;
-            for(BasicRecipe r : loadedRecipeMatches.keySet())
-            {
-                recipeNum++;
-                recipe = r;
-                ArrayList<Ingredient> ingredients = recipe.getIngredients();
-                for(Ingredient i : ingredients)
-                {
-                    recipeDetails += "       " + i.getName() + ": "
-                        + i.getAmount() +" "+ i.getUnit()+ "\n";
-                }
-                System.out.println(recipeNum + " "
-                    + recipe.getTitle() + ": \n" + "   Ingredients: \n"
-                    + recipeDetails + "\n   " + recipe.getCookingTime());
-                //displayInstructions(recipe);
-                recipes.put(new Integer(recipeNum), loadedRecipeMatches.get(recipe));
-            }
-            do
-            {
-                System.out.print(" \n" + "Please enter the number of the recipe to delete:"
-                    + "\nOr 0 to cancel: ");
-                if(inScan.hasNextInt())
-                {
-                    recipeChoice = inScan.nextInt();
-                    recipeToDelete = new Integer(recipeChoice);
-                    if(recipes.containsKey(recipeToDelete))
-                    {
-                        recipeChoice = recipes.get(recipeToDelete).intValue();
-                        newRecipeBatch.remove(recipeChoice);
-                        invalid = false;
-                    }
-                    else if(recipeChoice == 0)
-                    {
-                        invalid = false;
-                        System.out.println("Delete cancelled.");
-                    }
-                    else
-                    {
-                        System.out.println("Invalid option");
-                        invalid = true;
-                    }
-                }
-            }
-            while(invalid);
+            listMatchesAndDeleteRecipe(loadedMatches, "loaded", loadedRecipeMatches,
+                                                    recipeToDelete, recipes, newRecipeBatch);
         }
         else
         {
@@ -773,14 +682,97 @@ public class CookBookDriver implements Serializable
         }
     }
     
-    public void displayCurrentRecipesByHashtable(Hashtable<BasicRecipe, Integer> recipeHashtable)
+    /** display one recipe with corresponding list number
+     * @param recipe (BasicRecipe) - the recipe to be displayed
+     * @param recipeNumber (int) - recipe's list number
+     * @pre recipe and recipeNumber predetermined prior to being passed to method
+     */
+    public void displayOneRecipe(BasicRecipe recipe, int recipeNumber)
     {
-        displayRecipeFromHashTable(recipeHashtable);
+        String recipeDetails = "";
+        ArrayList<Ingredient> ingredients = recipe.getIngredients();
+        for(Ingredient i : ingredients)
+        {
+            recipeDetails += "       " + i.getName() + ": "
+                + i.getAmount() +" "+ i.getUnit()+ "\n";
+        }
+        System.out.println(recipeNumber + " "
+            + recipe.getTitle() + ": \n" + "   Ingredients: \n"
+            + recipeDetails + "\n   " + recipe.getCookingTime());
+        //displayInstructions(recipe);
     }
     
-    public void displayLoadedRecipesByHashtable(Hashtable<BasicRecipe, Integer> recipeHashtable)
+    /** get recipe choice and delete desired recipe from appropriate list
+     * @param recipeChoice (int) - item number of recipe to be deleted
+     * @param recipeToDelete (Integer) - Integer version of recipe selected for deletion
+     * @param recipes (Hashtable<Integer, Integer>) - collection of recipe numbers and their
+     *        respective indices
+     * @param recipeList (ArrayList<BasicRecipe>) - collection of current or loaded recipes
+     * @return boolean - true only if invalid input received, false otherwise: recipe deleted
+     *         or deletion skipped
+     */
+    public boolean deleteRecipeChoice(int recipeChoice, Integer recipeToDelete,
+                    Hashtable<Integer, Integer> recipes, ArrayList<BasicRecipe> recipeList)
     {
-        displayRecipeFromHashTable(recipeHashtable);
+        System.out.print(" \n" + "Please enter the number of the recipe to delete:"
+                    + "\nOr 0 to cancel: ");
+        if(inScan.hasNextInt())
+        {
+            recipeChoice = inScan.nextInt();
+            recipeToDelete = new Integer(recipeChoice);
+            if(recipes.containsKey(recipeToDelete))
+            {
+                recipeChoice = recipes.get(recipeToDelete).intValue();
+                recipeList.remove(recipeChoice);
+                System.out.println(" \n"+"Deleting recipe...");
+            }
+            else if(recipeChoice == 0)
+            {
+                System.out.println("Delete skipped.");
+            }
+            else
+            {
+                System.out.println("Invalid option");
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /** list all recipes matching given title from current and loaded recipe lists, prompt
+     * selection of desired recipe to delete or skip, delete desired recipe or skip as chosen
+     * @param numMatches (int) - number of recipes with matching title
+     * @param currentList (Str) - current or loaded descriptor of list containing matched recipe
+     * @param matchedRecipeCollection (Hashtable<BasicRecipe, Integer>) - the collection of
+     *        matched recipes from which recipes will be displayed and chosen for deletion
+     * @param recipeToDelete (Integer) - Integer version of desired recipe's list number
+     * @param recipes (Hashtable<Integer, Integer>) - collection of recipes' list numbers and
+     *        their respective indices
+     * @param recipeList (ArrayList<BasicRecipe>) - original list containing matched recipes
+     * 
+     */
+    public void listMatchesAndDeleteRecipe(int numMatches, String currentList,
+        Hashtable<BasicRecipe, Integer> matchedRecipeCollection, Integer recipeToDelete,
+        Hashtable<Integer, Integer> recipes, ArrayList<BasicRecipe> recipeList)
+    {
+        System.out.println(" \n" + "Found " + numMatches + " recipe(s)"
+                + " in " + currentList + " recipe list:");
+        BasicRecipe recipe = null;
+        int recipeNum = 0;
+        int recipeChoice = 0;
+        for(BasicRecipe r : matchedRecipeCollection.keySet())
+        {
+            recipe = r;
+            recipeNum++;
+            displayOneRecipe(r, recipeNum);
+            recipes.put(new Integer(recipeNum), matchedRecipeCollection.get(recipe));
+        }
+        do
+        {
+            invalid = deleteRecipeChoice(recipeChoice, recipeToDelete, recipes,
+                                                                        recipeList);
+        }
+        while(invalid);    
     }
     
     //String version of read recipes from file idea, unused, possibly obsolete
@@ -916,10 +908,10 @@ public class CookBookDriver implements Serializable
      */
     public void displayRecipeFromHashTable(Hashtable<BasicRecipe, Integer> listOfMatches)
     {
-        String recipeDetails = "";
         BasicRecipe recipe = null;
         for(BasicRecipe r : listOfMatches.keySet())
         {
+            String recipeDetails = "";
             recipe = r;
             ArrayList<Ingredient> ingredients = recipe.getIngredients();
             for(Ingredient i : ingredients)
